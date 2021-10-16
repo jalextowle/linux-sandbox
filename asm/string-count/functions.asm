@@ -16,7 +16,6 @@ finished:
     pop    ebx           ; pop the previous EBX register off the stack
     ret                  ; return
 
-; FIXME: Is this write? Don't we need to pop EAX at the bottom as well?
 ;----------------------------------------------
 ; void sprint(String message)
 ; String printing function
@@ -35,9 +34,24 @@ sprint:
     mov    eax, 4        ; Set the syscall to write
     int    80h           ; Schedule an interupt for the syscall
 
+    mov    eax, ecx      ; Move the string pointer back into EAX
     pop    ebx           ; Pop the previous value of EBX off the stack
     pop    ecx           ; Pop the previous value of ECX off the stack
     pop    edx           ; Pop the previous value of EAX off the stack
+    ret
+
+;----------------------------------------------
+; void sprintln(String message)
+; String printing function that prints a new line at the end
+sprintln:
+    push   eax           ; Push the argument onto the stack proactively.
+    call   sprint        ; Print the string.
+    mov    eax, 0Ah      ; Move the line feed character into EAX
+    push   eax           ; Push EAX onto the stack.
+    mov    eax, esp      ; Push ESP (the extended stack pointer) into EAX to print out the line feed character.
+    call   sprint        ; Print the line feed
+    pop    eax           ; Pop the new line feed off the stack
+    pop    eax           ; Pop the original EAX value off the stack
     ret
 
 ;----------------------------------------------

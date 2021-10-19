@@ -11,16 +11,16 @@ digits:
     mov    ecx, 10
     mov    ebx, 0
 
-digits_loop:
+.loop:
     ; loop through until total is divided to zero
     cmp    eax, 0
-    jz     digits_success
+    jz     .success
     mov    edx, 0
     div    ecx
     inc    ebx
-    jmp    digits_loop
+    jmp    .loop
 
-digits_success:
+.success:
     ; restore the registers to stack, add return to EAX, and return
     mov    eax, ebx
     pop    ebx
@@ -35,13 +35,13 @@ slen:
     push   ebx           ; push EBX onto the stack (this is the only variable we use)
     mov    ebx, eax      ; now EAX and EBX point to the provided input (EAX)
 
-nextchar:
+.loop:
     cmp    byte [eax], 0 ; compare the byte that EAX points to zero. this will set the zero flag (ZF) if appropriate
-    jz     finished      ; if the null terminator was found, jump to finished
+    jz     .success      ; if the null terminator was found, jump to finished
     inc    eax           ; increment EAX
-    jmp    nextchar      ; loop back to next char
+    jmp    .loop         ; loop back to next char
 
-finished:
+.success:
     sub    eax, ebx      ; compute EAX - EBX and put the result in EAX
     pop    ebx           ; pop the previous EBX register off the stack
     ret                  ; return
@@ -60,20 +60,20 @@ atoi:
     mov    ebx, eax ; use ebx to reference the string
     mov    eax, 0   ; use eax to refer to the total
 
-atoi_loop:
+.loop:
     cmp    byte [ebx], 0h  ; check to see if EBX points to the null terminator
-    jz     atoi_success    ; succeed if the string was terminated
+    jz     .success        ; succeed if the string was terminated
     cmp    byte [ebx], 0Ah ; check to see if EBX points to the new line
-    jz     atoi_success    ; succeed if the string was terminated
+    jz     .success        ; succeed if the string was terminated
     mov    ecx, 10         ; set ECX to 10
     mul    ecx             ; multiply EAX by 10 (the value stored in ECX)
     mov    dl, [ebx]       ; move the byte pointed to by EBX to DL (the 0 byte of EDX or RDX)
     sub    edx, 48         ; convert ascii digit to int
     add    eax, edx        ; add the digits integer value to the total
     inc    ebx             ; increment the EBX pointer
-    jmp    atoi_loop
+    jmp    .loop
 
-atoi_success:
+.success:
     ; restore previous registers and return
     pop    ebx
     pop    ecx
@@ -93,7 +93,7 @@ itoa:
 
     ; base case (i is zero)
     cmp    eax, 0
-    jz     itoa_base_case
+    jz     .base_case
 
     ; set up initial registers
     mov    ecx, 10
@@ -105,18 +105,18 @@ itoa:
     add    ebx, eax       ; add the updated EAX value to the EBX pointer
     pop    eax            ; restore the EAX register
 
-itoa_loop:
+.loop:
     ; add each digit to the string one at a time
     cmp    eax, 0         ; check if EAX is zero
-    jz     itoa_success   ; succeed if EAX is zero
+    jz     .success       ; succeed if EAX is zero
     mov    edx, 0         ; set up EDX for division
     div    ecx            ; divide EAX by 10. put the result in EAX and the remainder in EDX
     add    edx, 48        ; add 48 to the remainder to convert it to an ascii integer
     mov    byte [ebx], dl ; store the ascii character in the buffer
     dec    ebx            ; decrement the EBX pointer
-    jmp    itoa_loop
+    jmp    .loop
 
-itoa_success:
+.success:
     ; restore registers from stack and return
     pop    eax
     pop    ebx
@@ -124,26 +124,26 @@ itoa_success:
     pop    edx
     ret
 
-itoa_base_case:
+.base_case:
     ; write a zero to the string
     mov    byte [ebx], 48 ; write a zero into the string
-    jmp    itoa_success
+    jmp    .success
 
 ; TODO: This function is unsafe in that it will only remove a single trailing newline
 ;----------------------------------------------
 ; void str_remove_line_feed(String str)
 ; Strips the line feed from the string
-str_remove_trailing_line_fee:
+str_remove_trailing_line_feed:
     push  eax
 
-str_remove_line_feed_loop:
+.loop:
     ; find the trailing line feed character
     cmp   byte [eax], 0Ah
-    jz    str_remove_line_feed_success
+    jz    .success
     inc   eax
-    jmp   str_remove_line_feed_loop
+    jmp   .loop
 
-str_remove_line_feed_success:
+.success:
     ; delete the newline
     mov   byte [eax], 0h
 

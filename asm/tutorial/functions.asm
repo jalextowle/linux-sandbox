@@ -213,10 +213,19 @@ sin:
     ret
 
 ;----------------------------------------------
-; void sprint(String message)
-; String printing function
+; void quit()
+; Quits the program successfully
 quit:
     mov    ebx, 0        ; Exit code of 1
     mov    eax, 1        ; Exit syscall
     int    80h           ; Schedule interupt for exit
+    ret
+
+;----------------------------------------------
+; void exit(int code)
+; Exits the program with an exit code
+exit:
+    mov    ebx, eax
+    mov    eax, 1
+    int    80h
     ret
